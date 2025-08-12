@@ -2,6 +2,8 @@
 
 ---
 
+# Historias de Usuario:
+
 ## **HU1 – Ejecución desde terminal**
 
 **Historia de Usuario:**
@@ -189,3 +191,16 @@ HU7 – Pruebas unitarias,"Como desarrollador, quiero tener pruebas unitarias pa
 HU8 – Modo verbose educativo,"Como docente, quiero un modo --verbose que muestre paso a paso la ejecución de los algoritmos.",Sprint 2,Media
 HU9 – Documentación inicial,"Como usuario, quiero contar con una guía rápida para usar BeeLine.",Sprint 1,Media
 ```
+
+
+# Historias Épicas
+
+## **H1: Funcionalidad**
+Como usuario, quiero una herramienta completa de Investigación de Operaciones que me permita importar datos, elegir y ejecutar diferentes algoritmos para resolver problemas de grafos, y exportar resultados fácilmente.
+
+HU1 - HU5
+
+## **H2: Intuitiva**
+Como usuario y desarrollador, quiero una experiencia de uso mejorada y herramientas para validar y entender los algoritmos, con mensajes visuales, pruebas unitarias y un modo detallado para seguimiento.
+
+HU6-HU8
