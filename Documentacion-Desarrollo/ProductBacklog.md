@@ -195,12 +195,12 @@ HU9 – Documentación inicial,"Como usuario, quiero contar con una guía rápid
 
 # Historias Épicas
 
-## **H1: Funcionalidad**
+## **E1 - Funcionalidad**
 Como usuario, quiero una herramienta completa de Investigación de Operaciones que me permita importar datos, elegir y ejecutar diferentes algoritmos para resolver problemas de grafos, y exportar resultados fácilmente.
 
 HU1 - HU5
 
-## **H2: Intuitiva**
+## **E2 - Intuitividad**
 Como usuario y desarrollador, quiero una experiencia de uso mejorada y herramientas para validar y entender los algoritmos, con mensajes visuales, pruebas unitarias y un modo detallado para seguimiento.
 
 HU6-HU8
