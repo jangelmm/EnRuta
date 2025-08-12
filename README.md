@@ -1,5 +1,7 @@
 # BeeLine
 
+![Imagen](./Documentacion-Desarrollo/Images/BeeLine.jpg)
+
 Documentación del Proyecto
 ## Documentación Técnica
 
