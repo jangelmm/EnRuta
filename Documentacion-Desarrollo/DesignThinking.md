@@ -1,68 +1,67 @@
-# **Design Thinking aplicado a BeeLine**
+# **Design Thinking aplicado a EnRuta**
 
 ## **1. Descubrimiento / Empatía / Investigación (Divergencia)**
 
-* **Contexto detectado**: La mayoría de herramientas de investigación de operaciones (IO) para resolver problemas como ruta más corta o árbol mínimo de expansión son:
+* **Contexto detectado**:  
+  En muchas ciudades, como en nuestro caso, los usuarios del transporte público utilizan grupos de WhatsApp para informar en tiempo real la ubicación aproximada de los autobuses.  
+  Actualmente:
+  * La información es valiosa pero está dispersa en chats y no se centraliza.
+  * No existe un sistema público y gratuito que organice y visualice estos datos en tiempo real.
+  * La información puede estar escrita con variaciones, errores ortográficos o en formatos no estandarizados.
 
-  * Difíciles de usar para principiantes (requieren aprender un lenguaje específico).
-  * Pensadas para entornos académicos avanzados o empresas grandes.
-  * En su versión simple y usable, suelen ser de pago.
 * **Necesidades de los usuarios**:
+  * Pasajeros que quieren saber dónde está el próximo autobús de su ruta.
+  * Conductores y administradores de rutas que desean conocer la ubicación y frecuencia del servicio.
+  * Comunidad y desarrolladores que podrían crear soluciones a partir de estos datos abiertos.
 
-  * Estudiantes y docentes que quieren enseñar o aprender algoritmos de IO sin curva de aprendizaje alta.
-  * Profesionales que necesitan resolver problemas rápidos desde un archivo, sin instalar software pesado.
-  * Comunidad open source interesada en contribuir y expandir funcionalidades.
 * **Hallazgos clave**:
-
-  * Escasez de herramientas educativas, open source y con interfaz de línea de comandos (CLI) amigable.
-  * Demanda de soluciones simples que trabajen directamente con formatos comunes como CSV.
+  * Los datos ya existen y se actualizan constantemente gracias a la comunidad.
+  * No se requiere instalar dispositivos GPS en cada unidad, solo aprovechar la información colaborativa.
+  * La principal barrera es la **limpieza, estructuración y acceso** a los datos.
 
 ---
 
 ## **2. Definición / Síntesis (Divergencia)**
 
-* **Problema a resolver**:
-  *"Actualmente no existe una herramienta de investigación de operaciones que sea gratuita, open source, fácil de usar desde terminal, que procese datos en formato CSV y devuelva resultados de forma directa, orientada tanto a la educación como a casos prácticos simples."*
-* **Oportunidad de mercado**:
+* **Problema a resolver**:  
+  *"La información sobre la ubicación de los autobuses urbanos está disponible en grupos de WhatsApp pero no está centralizada, estandarizada ni es fácilmente accesible para la comunidad en general."*
 
-  * Crear una solución minimalista pero extensible, que sirva como introducción a IO y como herramienta práctica.
-  * Enfocarse en una experiencia de uso rápida: `beeline input.csv output.csv algoritmo=...`
-  * Crecer modularmente (scrum) para ir incorporando más algoritmos y funcionalidades.
+* **Oportunidad de impacto**:
+  * Facilitar el acceso a información confiable y en tiempo real sobre transporte público.
+  * Empoderar a la comunidad y reducir la incertidumbre sobre tiempos de espera.
+  * Aprovechar una fuente de datos ya existente para fines de análisis, planificación urbana y desarrollo de aplicaciones.
 
 ---
 
 ## **3. Ideación (Divergencia y Convergencia)**
 
 * **Lluvia de ideas de funciones iniciales**:
+  * Script para extraer mensajes de grupos de WhatsApp (usando API oficial o técnicas de exportación).
+  * Procesamiento de texto para estandarizar información (NLP básico, regex).
+  * Base de datos centralizada con fecha, hora, número de unidad, ubicación y destino.
+  * Dashboard web para visualizar la ubicación aproximada de autobuses en un mapa.
+  * API pública para que otros desarrolladores creen herramientas.
+  * Bot de consulta (Telegram/WhatsApp) para preguntar por el estado de una ruta.
 
-  * Algoritmos de ruta más corta (Dijkstra, Bellman-Ford, Floyd-Warshall).
-  * Árbol mínimo de expansión (Kruskal, Prim).
-  * Entrada y salida en CSV sin pasos intermedios.
-  * Modo educativo con explicaciones paso a paso.
-  * Código limpio en C++ y documentado para fomentar contribuciones.
-  * Soporte para datos con etiquetas de texto, no solo índices numéricos.
-* **Selección para primera versión**:
-
-  * CLI minimalista con colores y progreso (para dar feedback visual en terminal).
-  * Implementar primero Dijkstra y Kruskal.
-  * Documentación clara con ejemplos de uso.
+* **Selección para primera versión (Fase 1)**:
+  * Extracción y limpieza de datos desde mensajes exportados.
+  * Almacenamiento en una base de datos (MySQL, PostgreSQL).
+  * Documentación clara para que otros puedan replicar el proceso.
 
 ---
 
 ## **4. Implementación / Construcción (Divergencia y Convergencia)**
 
 * **Primera iteración (v0.1)**:
+  * Script que lee mensajes exportados de WhatsApp en formato `.txt`.
+  * Limpieza y normalización de datos: separar número de autobús, ubicación y destino.
+  * Guardado de datos en base de datos con timestamp.
 
-  * Lectura de CSV de nodos y aristas.
-  * Ejecución de algoritmo seleccionado desde argumentos de línea de comandos.
-  * Exportación de resultados a CSV con ruta y costo.
 * **Pruebas y feedback**:
+  * Validar con un grupo pequeño de usuarios que los datos procesados correspondan a la realidad.
+  * Ajustar expresiones regulares y diccionarios de sinónimos/errores ortográficos.
 
-  * Compartir prototipo con estudiantes y docentes de IO.
-  * Ajustar comandos y formatos según comentarios.
 * **Iteraciones siguientes**:
-
-  * Agregar más algoritmos (Floyd-Warshall, flujo máximo, asignación).
-  * Modo “verbose” educativo para explicar cada paso.
-  * Optimización de rendimiento y soporte para datasets más grandes.
-
+  * Integrar visualización en mapa en tiempo real.
+  * Implementar consulta por API o bot.
+  * Habilitar sistema de contribución para que la comunidad envíe datos desde distintas fuentes.

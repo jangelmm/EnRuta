@@ -1,206 +1,187 @@
-# **Product Backlog – BeeLine** 
+# **Product Backlog – EnRuta**
 
 ---
 
-# Historias de Usuario:
-
-## **HU1 – Ejecución desde terminal**
-
-**Historia de Usuario:**
-Como usuario, quiero ejecutar BeeLine desde la terminal con parámetros de entrada y salida para resolver un problema específico.
-
-**Criterios de aceptación:**
-
-* BeeLine acepta parámetros como:
-
-  ```bash
-  beeline input.csv output.csv --algoritmo dijkstra --origen A
-  ```
-* Si los parámetros son inválidos, muestra mensaje de ayuda.
-* Soporta `--help` para mostrar comandos disponibles.
-
-**Tareas técnicas:**
-
-* Configurar parser de argumentos (ej. `getopt` o `cxxopts`).
-* Implementar comando `--help`.
-* Validar rutas y existencia de archivos.
+## Historias de Usuario
 
 ---
 
-## **HU2 – Lectura de CSV**
+### **HU1 – Recepción de mensajes desde WhatsApp Cloud API**
 
 **Historia de Usuario:**
-Como usuario, quiero que BeeLine lea datos de un archivo CSV que contenga nodos y aristas para que el programa pueda procesarlos.
+Como desarrollador, quiero recibir mensajes enviados al número de WhatsApp de EnRuta a través de un webhook para poder procesarlos automáticamente.
 
 **Criterios de aceptación:**
 
-* Soporta CSV con encabezados `origen, destino, peso`.
-* Detecta errores de formato y muestra advertencia.
-* Soporta separador `,` y `;`.
+* El sistema recibe mensajes en formato texto.
+* Si el mensaje no tiene contenido válido, se descarta con un log.
+* El endpoint responde con código HTTP 200 para confirmar la recepción a Meta.
 
 **Tareas técnicas:**
 
-* Implementar función `leerCSV()`.
-* Validar formato y datos numéricos.
-* Escribir pruebas unitarias para casos válidos y con errores.
+* Configurar webhook con WhatsApp Cloud API.
+* Implementar endpoint en **Python** con **Flask** o **FastAPI** para recibir POST.
+* Guardar mensaje crudo en log temporal.
 
 ---
 
-## **HU3 – Algoritmo Dijkstra**
+### **HU2 – Limpieza y normalización de texto**
 
 **Historia de Usuario:**
-Como usuario, quiero calcular la ruta más corta entre un nodo origen y todos los demás usando Dijkstra.
+Como desarrollador, quiero limpiar y normalizar el contenido de los mensajes para manejar errores ortográficos y formatos distintos.
 
 **Criterios de aceptación:**
 
-* Devuelve distancias mínimas desde el nodo origen.
-* Si un nodo es inalcanzable, marcar como `INF`.
-* Procesa grafos no dirigidos y dirigidos.
+* Elimina caracteres especiales no necesarios.
+* Detecta patrón “\<número> en \<lugar> para \<destino>” aunque tenga variaciones de mayúsculas o errores menores.
+* Convierte a minúsculas y elimina espacios extra.
 
 **Tareas técnicas:**
 
-* Implementar módulo `dijkstra.cpp`.
-* Optimizar con cola de prioridad.
-* Pruebas unitarias con grafos de ejemplo.
+* Crear módulo `data_cleaner.py`.
+* Implementar regex flexible para extraer número, ubicación y destino.
+* Escribir pruebas unitarias con `pytest` para casos correctos y con errores.
 
 ---
 
-## **HU4 – Algoritmo Kruskal**
+### **HU3 – Almacenamiento en base de datos**
 
 **Historia de Usuario:**
-Como usuario, quiero calcular el árbol de expansión mínima usando Kruskal.
+Como desarrollador, quiero guardar los mensajes procesados en una base de datos con fecha, remitente y contenido limpio para usarlos posteriormente.
 
 **Criterios de aceptación:**
 
-* Devuelve lista de aristas del MST y peso total.
-* Funciona en grafos no dirigidos.
-* Si el grafo no es conexo, devuelve MST por componente.
+* Se almacena: fecha, remitente, ruta detectada, ubicación, destino.
+* Evita registros duplicados si son el mismo mensaje en corto intervalo.
+* Soporta PostgreSQL o SQLite para desarrollo rápido.
 
 **Tareas técnicas:**
 
-* Implementar módulo `kruskal.cpp` con Union-Find.
-* Validar casos de grafos pequeños y grandes.
-* Escribir pruebas unitarias.
+* Crear esquema en base de datos con **SQLAlchemy**.
+* Implementar módulo `db_service.py` para inserción y consulta.
+* Pruebas de conexión y guardado.
 
 ---
 
-## **HU5 – Escritura de CSV de resultados**
+### **HU4 – Visualización en consola (modo debug)**
 
 **Historia de Usuario:**
-Como usuario, quiero que BeeLine exporte los resultados a un archivo CSV para poder procesarlos en otras herramientas.
+Como usuario técnico, quiero ver en la consola cada mensaje procesado para verificar que se está limpiando y guardando correctamente.
 
 **Criterios de aceptación:**
 
-* Soporta encabezados claros (`nodo, distancia` o `origen, destino, peso`).
-* Genera archivo nuevo sin sobrescribir sin confirmación.
-* Maneja errores de permisos o disco lleno.
+* Muestra datos extraídos en formato legible.
+* Incluye timestamp y remitente.
+* Colores para resaltar errores o campos vacíos.
 
 **Tareas técnicas:**
 
-* Implementar función `escribirCSV()`.
-* Pruebas unitarias con distintos tamaños de salida.
-* Validar codificación UTF-8.
+* Implementar logging con `logging` y `colorama`.
+* Configurar logs por niveles (info, warn, error).
 
 ---
 
-## **HU6 – Barra de progreso y colores**
+### **HU5 – Exportación de datos**
 
 **Historia de Usuario:**
-Como usuario, quiero ver una barra de progreso y mensajes en colores para entender el avance.
+Como administrador, quiero exportar mensajes procesados a CSV o JSON para analizarlos externamente.
 
 **Criterios de aceptación:**
 
-* Barra de progreso en porcentaje.
-* Colores para advertencias, errores y resultados.
-* Compatible con terminales comunes.
+* Soporta exportación de rango de fechas.
+* Encabezados claros: `fecha, remitente, ruta, ubicación, destino`.
+* Archivo descargable o guardado en carpeta local.
 
 **Tareas técnicas:**
 
-* Usar librería como `termcolor` o ANSI codes.
-* Implementar barra en funciones largas.
-* Pruebas en Windows y Linux.
+* Implementar función `exportar_datos()` en `db_service.py`.
+* Validar formato y codificación UTF-8.
+* Pruebas con datos pequeños y grandes.
 
 ---
 
-## **HU7 – Pruebas unitarias**
+### **HU6 – Respuesta automática opcional**
 
 **Historia de Usuario:**
-Como desarrollador, quiero tener pruebas unitarias para garantizar que los algoritmos funcionan correctamente.
+Como usuario que envía un mensaje, quiero recibir una confirmación automática de que mi reporte fue recibido.
 
 **Criterios de aceptación:**
 
-* Pruebas para Dijkstra y Kruskal.
-* Pruebas para entrada/salida CSV.
-* Integración en CI/CD de GitHub Actions.
+* Mensaje de agradecimiento con hora de recepción.
+* Opcional (configurable en `.env`).
+* No responde a mensajes vacíos o inválidos.
 
 **Tareas técnicas:**
 
-* Configurar `Catch2` o `GoogleTest`.
+* Integrar envío de mensaje con WhatsApp Cloud API usando `requests`.
+* Configuración para activar/desactivar respuesta.
+
+---
+
+### **HU7 – Configuración mediante variables de entorno**
+
+**Historia de Usuario:**
+Como desarrollador, quiero configurar credenciales y parámetros en un archivo `.env` para evitar exponer datos sensibles en el código.
+
+**Criterios de aceptación:**
+
+* Variables: token API, URL webhook, conexión DB, opciones de respuesta automática.
+* El sistema lee y valida las variables al iniciar.
+
+**Tareas técnicas:**
+
+* Usar `python-dotenv` para carga de variables.
+* Implementar validación de configuración en arranque.
+
+---
+
+### **HU8 – Pruebas unitarias**
+
+**Historia de Usuario:**
+Como desarrollador, quiero pruebas unitarias para asegurar que la limpieza, almacenamiento y exportación funcionan correctamente.
+
+**Criterios de aceptación:**
+
+* Pruebas para `data_cleaner`, `db_service` y exportación.
+* Cobertura mínima del 80%.
+* Integración con GitHub Actions.
+
+**Tareas técnicas:**
+
+* Configurar `pytest` y `coverage`.
 * Crear dataset de prueba.
-* Integrar pruebas en workflow.
+* Integrar con CI/CD.
 
 ---
 
-## **HU8 – Modo verbose educativo**
-
-**Historia de Usuario:**
-Como docente, quiero un modo `--verbose` que muestre paso a paso la ejecución de los algoritmos.
-
-**Criterios de aceptación:**
-
-* Muestra en consola cada iteración del algoritmo.
-* Colores para resaltar cambios.
-* Se activa con `--verbose`.
-
-**Tareas técnicas:**
-
-* Agregar logs detallados.
-* Opcional: ralentizar pasos para visualización.
-* Pruebas con ejemplos educativos.
-
----
-
-## **HU9 – Documentación inicial**
-
-**Historia de Usuario:**
-Como usuario, quiero contar con una guía rápida para usar BeeLine.
-
-**Criterios de aceptación:**
-
-* README con ejemplos.
-* Instrucciones de compilación e instalación.
-* Tabla de algoritmos soportados.
-
-**Tareas técnicas:**
-
-* Escribir README.md.
-* Crear ejemplos en carpeta `/examples`.
-* Capturas de pantalla de ejecución.
-
----
+## Tabla Resumen (CSV)
 
 ```
 Título,Descripción,Etiqueta,Prioridad
-HU1 – Ejecución desde terminal,"Como usuario, quiero ejecutar BeeLine desde la terminal con parámetros de entrada y salida para resolver un problema específico.",Sprint 1,Alta
-HU2 – Lectura de CSV,"Como usuario, quiero que BeeLine lea datos de un archivo CSV que contenga nodos y aristas para que el programa pueda procesarlos.",Sprint 1,Alta
-HU3 – Algoritmo Dijkstra,"Como usuario, quiero calcular la ruta más corta entre un nodo origen y todos los demás usando Dijkstra.",Sprint 1,Alta
-HU4 – Algoritmo Kruskal,"Como usuario, quiero calcular el árbol de expansión mínima usando Kruskal.",Sprint 2,Alta
-HU5 – Escritura de CSV de resultados,"Como usuario, quiero que BeeLine exporte los resultados a un archivo CSV para poder procesarlos en otras herramientas.",Sprint 1,Media
-HU6 – Barra de progreso y colores,"Como usuario, quiero ver una barra de progreso y mensajes en colores para entender el avance.",Sprint 2,Media
-HU7 – Pruebas unitarias,"Como desarrollador, quiero tener pruebas unitarias para garantizar que los algoritmos funcionan correctamente.",Sprint 1,Alta
-HU8 – Modo verbose educativo,"Como docente, quiero un modo --verbose que muestre paso a paso la ejecución de los algoritmos.",Sprint 2,Media
-HU9 – Documentación inicial,"Como usuario, quiero contar con una guía rápida para usar BeeLine.",Sprint 1,Media
+HU1 – Recepción de mensajes desde WhatsApp Cloud API,"Como desarrollador, quiero recibir mensajes enviados al número de WhatsApp de EnRuta a través de un webhook para poder procesarlos automáticamente.",Sprint 1,Alta
+HU2 – Limpieza y normalización de texto,"Como desarrollador, quiero limpiar y normalizar el contenido de los mensajes para manejar errores ortográficos y formatos distintos.",Sprint 1,Alta
+HU3 – Almacenamiento en base de datos,"Como desarrollador, quiero guardar los mensajes procesados en una base de datos con fecha, remitente y contenido limpio para usarlos posteriormente.",Sprint 1,Alta
+HU4 – Visualización en consola (modo debug),"Como usuario técnico, quiero ver en la consola cada mensaje procesado para verificar que se está limpiando y guardando correctamente.",Sprint 1,Media
+HU5 – Exportación de datos,"Como administrador, quiero exportar mensajes procesados a CSV o JSON para analizarlos externamente.",Sprint 2,Media
+HU6 – Respuesta automática opcional,"Como usuario que envía un mensaje, quiero recibir una confirmación automática de que mi reporte fue recibido.",Sprint 2,Media
+HU7 – Configuración mediante variables de entorno,"Como desarrollador, quiero configurar credenciales y parámetros en un archivo .env para evitar exponer datos sensibles en el código.",Sprint 1,Alta
+HU8 – Pruebas unitarias,"Como desarrollador, quiero pruebas unitarias para asegurar que la limpieza, almacenamiento y exportación funcionan correctamente.",Sprint 1,Alta
 ```
 
+---
 
-# Historias Épicas
+## Historias Épicas
 
-## **E1 - Funcionalidad**
-Como usuario, quiero una herramienta completa de Investigación de Operaciones que me permita importar datos, elegir y ejecutar diferentes algoritmos para resolver problemas de grafos, y exportar resultados fácilmente.
+---
 
-HU1 - HU5
+### **E1 - Adquisición y procesamiento de datos**
 
-## **E2 - Intuitividad**
-Como usuario y desarrollador, quiero una experiencia de uso mejorada y herramientas para validar y entender los algoritmos, con mensajes visuales, pruebas unitarias y un modo detallado para seguimiento.
+Como desarrollador, quiero un sistema capaz de recibir, limpiar y almacenar mensajes de rutas de autobús enviados por WhatsApp para luego analizarlos.
+Incluye: **HU1 – HU4 – HU7**
 
-HU6-HU8
+---
+
+### **E2 - Distribución y análisis**
+
+Como usuario o administrador, quiero herramientas para exportar datos, generar respuestas automáticas y garantizar calidad mediante pruebas, para aprovechar la información colectada.
+Incluye: **HU5 – HU6 – HU8**

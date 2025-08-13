@@ -1,9 +1,13 @@
-# **Scrum aplicado a BeeLine** 
+Aquí tienes el documento reescrito para que use **Python** y encaje con tu stack:
 
-- Proyecto: **BeeLine**
-- Tecnología: **C++**
-- Metodología: **Scrum**
-- Nota:  **PO + SM + Dev** Único, Scrum ligero para una sola persona.
+---
+
+# **Scrum aplicado a EnRuta**
+
+* Proyecto: **EnRuta**
+* Tecnología: **Python + Flask/FastAPI + WhatsApp Cloud API**
+* Metodología: **Scrum**
+* Nota: **PO + SM + Dev** único, Scrum ligero para una sola persona.
 
 ---
 
@@ -11,296 +15,119 @@
 
 **Actividad principal:**
 
-* Definir alcance del MVP.
-* Crear repositorio GitHub y configurar CMake, GitHub Actions (compilación/pruebas), Issues y Projects.
+* Definir alcance del MVP (solo recolección, limpieza y almacenamiento de mensajes).
+* Crear repositorio GitHub y configurar:
+
+  * Proyecto Python con entorno virtual y estructura modular.
+  * Integración con WhatsApp Cloud API usando `requests` o cliente HTTP equivalente.
+  * GitHub Actions para pruebas automáticas con `pytest`.
+  * Issues y Projects para seguimiento.
 * Esbozar arquitectura:
 
-  * Módulo de entrada/salida CSV.
-  * Módulo de algoritmos.
-  * CLI.
-
-### Análisis del Dominio
-**Product Backlog inicial (priotizado)**:
-
-1. **HU1**: Como usuario, quiero ejecutar BeeLine desde terminal con parámetros de entrada/salida.
-2. **HU2**: Como usuario, quiero leer datos desde CSV de nodos/aristas.
-3. **HU3**: Como usuario, quiero resolver el problema de ruta más corta usando Dijkstra.
-4. **HU4**: Como usuario, quiero resolver el problema de árbol mínimo usando Kruskal.
-5. **HU5**: Como usuario, quiero recibir un CSV con los resultados.
-6. **HU6**: Como usuario, quiero ver una barra de progreso y mensajes en color.
-7. **HU7**: Como desarrollador, quiero tener pruebas unitarias para validar los algoritmos.
-8. **HU8**: Como docente, quiero un modo "verbose" para mostrar pasos del algoritmo.
-
-Para más información y detalles consulte [Product Backlog](/Documentacion-Desarrollo/ProductBacklog.md)
+  * Módulo de conexión a la API de WhatsApp.
+  * Módulo de limpieza y normalización de datos.
+  * Módulo de almacenamiento en base de datos.
 
 ---
 
-### Diseño Estático Inicial
+### **Análisis del Dominio**
 
-- Lenguaje: C++
-- Sistema Operativo: Linux (Debian)
-- Arquitectura: Modelo Vista Controlador
+**Product Backlog inicial (priorizado):**
+
+1. **HU1**: Como desarrollador, quiero recibir mensajes desde WhatsApp Cloud API en un endpoint HTTP.
+2. **HU2**: Como desarrollador, quiero validar y limpiar datos (quitar caracteres no deseados, normalizar texto).
+3. **HU3**: Como desarrollador, quiero guardar los mensajes en una base de datos con marca de tiempo y remitente.
+4. **HU4**: Como usuario del sistema, quiero poder ver un log de mensajes procesados en consola para verificar.
+5. **HU5**: Como desarrollador, quiero pruebas unitarias para asegurar que el procesamiento de mensajes es correcto.
+6. **HU6**: Como administrador, quiero que los datos se guarden en un formato exportable (CSV o JSON).
+7. **HU7**: Como usuario, quiero recibir un mensaje automático de confirmación al enviar datos al sistema.
+8. **HU8**: Como administrador, quiero configurar las credenciales de API y DB mediante variables de entorno.
+
+Para más detalles consulte [Product Backlog](/Documentacion-Desarrollo/ProductBacklog.md)
+
+---
+
+### **Diseño Estático Inicial**
+
+* Lenguaje: Python
+* Framework: Flask o FastAPI
+* Base de datos: PostgreSQL o SQLite (para desarrollo rápido)
+* Arquitectura: API REST modular
 
 **Diagrama de Clases Inicial (PMV)**
 
 ```mermaid
 classDiagram
-    class BeeLine {
-        +main(args)
-        +run()
+    class EnRuta {
+        +main()
+        +start_server()
     }
 
-    %% Modelo
-    class Grafo {
-        +nodos
-        +aristas
-        +agregarNodo()
-        +agregarArista()
-        +buscarNodo(id)
-        +validar()
-    }
-    class Nodo {
-        +id
-        +etiqueta
-    }
-    class Resultado {
-        +ruta
-        +costo
-        +aString()
+    class WhatsAppService {
+        +recibir_mensaje(request)
+        +enviar_respuesta(numero, texto)
     }
 
-    %% Parámetros para Algoritmos
-    class Parametros {
-        +origen
-        +destino
-        +otros
+    class DataCleaner {
+        +limpiar_texto(texto)
+        +normalizar(fecha, texto)
     }
 
-    %% Lógica (parte del Modelo o lógica aparte)
-    class Algoritmo {
-        <<interface>>
-        +resolver(grafo, parametros, resultado)
-    }
-    class Dijkstra {
-        +resolver(grafo, parametros, resultado)
-    }
-    class Kruskal {
-        +resolver(grafo, parametros, resultado)
+    class DBService {
+        +guardar_mensaje(mensaje)
+        +exportar_datos(formato)
     }
 
-    %% Vista (CLI)
-    class VistaCLI {
-        +mostrarMensaje(texto)
-        +mostrarError(texto)
-        +mostrarProgreso(porcentaje)
-        +mostrarResultado(resultado)
-        +setNivelLog(nivel)
+    class Config {
+        +get(key)
     }
 
-    %% Parser de argumentos separado
-    class ParserArgs {
-        +parsear(args)
-        +obtenerParametros()
-    }
-
-    %% Controlador
-    class Controlador {
-        +ejecutar(args)
-    }
-
-    %% IO
-    class CSVReader {
-        +leerArchivo(path, grafo)
-    }
-    class CSVWriter {
-        +escribirArchivo(path, resultado)
-    }
-
-    %% Relaciones
-    BeeLine "1" --> "1" Controlador : usa
-    Controlador "1" --> "1" VistaCLI : usa
-    Controlador "1" --> "1" CSVReader : usa
-    Controlador "1" --> "1" CSVWriter : usa
-    Controlador "1" --> "1" Algoritmo : usa
-    Controlador "1" --> "1" ParserArgs : usa
-    Controlador "1" --> "1" Grafo : crea
-
-    Algoritmo <|.. Dijkstra
-    Algoritmo <|.. Kruskal
-
-    Grafo "1" --> "*" Nodo : contiene
-    Grafo "1" --> "*" Arista : contiene
-
-    VistaCLI ..> Resultado : muestra
-    CSVWriter ..> Resultado : escribe
-    ParserArgs ..> Parametros : genera
-
+    EnRuta --> WhatsAppService : usa
+    EnRuta --> DBService : usa
+    WhatsAppService --> DataCleaner : usa
+    WhatsAppService --> DBService : usa
+    DBService --> Config : usa
 ```
-
-#### Construcción del diagrama
-
-Este diagrama representa la arquitectura modular de BeeLine basada en responsabilidades claras, orientada a objetos y siguiendo un patrón similar a MVC adaptado a una aplicación de consola (CLI).
-
-Cada clase representa un componente o módulo con funciones específicas, y las relaciones muestran cómo interactúan o dependen unas de otras.
-
-
-#### Explicación de cada componente y su interacción
-
-##### 1. **BeeLine**
-
-* Es la clase principal, el punto de entrada del programa.
-* Contiene el método `main` que inicia la ejecución y llama al método `run()`.
-* Su función es crear la instancia del **Controlador** y delegar la ejecución.
-
-##### 2. **Controlador**
-
-* Es el núcleo que orquesta el flujo general del programa.
-* Usa el **ParserArgs** para interpretar los argumentos de línea de comandos y obtener parámetros configurables (como archivos, algoritmo, nodos origen/destino).
-* Crea una instancia de **Grafo** para almacenar la estructura del problema.
-* Usa **CSVReader** para leer la definición del grafo desde un archivo CSV y cargar nodos y aristas.
-* Según el parámetro del usuario, crea la instancia adecuada de un **Algoritmo** (por ejemplo, `Dijkstra` o `Kruskal`) para procesar el grafo.
-* Pasa el grafo y parámetros al algoritmo para que resuelva el problema, obteniendo un **Resultado**.
-* Usa **CSVWriter** para guardar el resultado en un archivo.
-* Controla la salida mediante la **VistaCLI** para mostrar mensajes, errores y resultados al usuario.
-
-##### 3. **ParserArgs**
-
-* Se encarga exclusivamente de leer y analizar los argumentos que recibe el programa (por ejemplo, nombres de archivos, selección de algoritmo, nodos origen y destino).
-* Devuelve un objeto **Parametros** con toda esta información estructurada para que el controlador la use fácilmente.
-* Esto mejora la separación de responsabilidades y facilita el mantenimiento.
-
-##### 4. **Modelo**
-
-* **Grafo**: representa la red de nodos y conexiones entre ellos.
-
-  * Contiene colecciones de **Nodo** y **Arista**.
-  * Tiene métodos para agregar nodos/aristas, buscar nodos por ID y validar la integridad del grafo (por ejemplo, que las aristas apunten a nodos válidos).
-* **Nodo**: representa un vértice del grafo, identificado por un ID único y una etiqueta descriptiva.
-* **Resultado**: almacena el resultado del cálculo, como la ruta obtenida y su costo total.
-
-  * Tiene un método `aString()` para convertirlo a texto para impresión o guardado.
-
-##### 5. **Algoritmos**
-
-* Interfaz **Algoritmo** define el contrato que deben cumplir todos los algoritmos de resolución, con el método `resolver()` que recibe un grafo, parámetros y devuelve un resultado.
-* Clases concretas como **Dijkstra** y **Kruskal** implementan esta interfaz para resolver problemas específicos (ruta más corta, árbol mínimo de expansión).
-
-##### 6. **IO (Entrada/Salida)**
-
-* **CSVReader**: lee archivos CSV que describen los nodos y aristas del grafo y los carga en la estructura de datos.
-* **CSVWriter**: escribe los resultados obtenidos en un archivo CSV para que el usuario pueda ver o procesar después.
-
-##### 7. **VistaCLI**
-
-* Maneja toda la interacción con el usuario en consola.
-* Muestra mensajes informativos, errores, progreso y resultados.
-* También puede controlar el nivel de detalle o verbosidad con métodos como `setNivelLog()`.
 
 ---
 
-#### Flujo general de interacción
+### **Flujo General de Interacción**
 
-1. El usuario ejecuta `BeeLine` desde consola con argumentos (archivos, algoritmo, nodos).
-2. `BeeLine` llama al `Controlador` para iniciar el proceso.
-3. `Controlador` usa `ParserArgs` para interpretar los argumentos y obtener parámetros estructurados.
-4. `Controlador` crea un `Grafo` vacío.
-5. `CSVReader` lee el archivo de entrada y carga nodos/aristas en el `Grafo`.
-6. Según el parámetro, el `Controlador` crea la instancia del algoritmo deseado (por ejemplo, `Dijkstra`).
-7. El algoritmo procesa el grafo con los parámetros (nodo origen, destino, etc.) y genera un `Resultado`.
-8. `CSVWriter` guarda el resultado en un archivo de salida.
-9. `VistaCLI` muestra mensajes, errores y el resultado al usuario.
+1. WhatsApp envía un mensaje a través de la API de Meta.
+2. **WhatsAppService** recibe el POST y extrae el contenido.
+3. **DataCleaner** normaliza y limpia el texto.
+4. **DBService** guarda el mensaje en la base de datos con fecha, remitente y contenido limpio.
+5. Se devuelve una respuesta automática al usuario por WhatsApp (opcional en MVP).
 
 ---
 
-#### Resumen
+### **Sprint 1 (2 semanas)**
 
-* Cada clase tiene una responsabilidad única.
-* La arquitectura modular facilita mantenimiento, pruebas y futuras extensiones (añadir más algoritmos, otros formatos de archivo, interfaces gráficas).
-* El controlador es el coordinador, pero la lógica, datos y vista están bien separados.
+**Objetivo del sprint**:
+EnRuta recibe mensajes y los guarda limpios en la base de datos.
 
+**Historias seleccionadas**: HU1, HU2, HU3, HU4.
 
-### Configuración del Entorno
-#### Estructura de carpetas
-```
-BeeLine/
-│
-├── src/                          # Código fuente C++
-│   ├── main.cpp                  # Función main, instancia BeeLine y llama run()
-│   ├── BeeLine.cpp/.h            # Clase principal BeeLine
-│   ├── Controlador.cpp/.h        # Controlador que orquesta la app
-│   ├── Modelo/                   # Clases del modelo (Grafo, Nodo, Resultado)
-│   │   ├── Grafo.cpp/.h
-│   │   ├── Nodo.cpp/.h
-│   │   └── Resultado.cpp/.h
-│   ├── Algoritmos/               # Implementaciones de Algoritmos
-│   │   ├── Algoritmo.h           # Interfaz
-│   │   ├── Dijkstra.cpp/.h
-│   │   └── Kruskal.cpp/.h
-│   ├── IO/                      # Entrada/Salida CSV
-│   │   ├── CSVReader.cpp/.h
-│   │   └── CSVWriter.cpp/.h
-│   ├── Vista/                   # Vista para CLI
-│   │   └── VistaCLI.cpp/.h
-│   └── Utils/                   # Parser de argumentos y utilerías
-│       ├── ParserArgs.cpp/.h
-│       └── Parametros.cpp/.h
-│
-├── tests/                       # Pruebas unitarias (ejemplo con Google Test)
-│
-├── data/                        # Archivos CSV de ejemplo para entrada y salida
-│
-├── build/                       # Archivos compilados y ejecutables (generado)
-│
-├── docs/                        # Documentación, diagramas, manuales
-│
-├── README.md                   # Descripción y guía rápida del proyecto
-├── CMakeLists.txt              # Configuración para compilación con CMake
-└── .gitignore                  # Archivos y carpetas ignorados por Git
-```
-#### Software
-- Compilador C++ (g++)
-```
-sudo apt update
-sudo apt install build-essential g++
-```
-
-- CMake para gestión de compilación
-```
-sudo apt install cmake
-```
-
-- Git para control de versiones
-```
-sudo apt install git
-```
-
-- Editor: Visual Studio Code
-
-### Anexos
-
-
-#### **Sprint 1 (2 semanas)**
-
-**Objetivo del sprint**: BeeLine ejecuta Dijkstra y Kruskal con entrada/salida en CSV.
-**Historias seleccionadas**: HU1, HU2, HU3, HU4, HU5.
-**Entregable**: Versión v0.1 funcional, sin modo verbose.
+**Entregable**: Versión v0.1 funcional que recibe y almacena mensajes.
 
 ---
 
-#### **Sprint 2 (2 semanas)**
+### **Sprint 2 (2 semanas)**
 
-**Objetivo**: Mejorar experiencia y preparar para contribuciones.
-**Historias seleccionadas**: HU6, HU7, HU8.
-**Entregable**: v0.2 con colores, barra de progreso y modo educativo.
+**Objetivo**:
+Mejorar la experiencia y preparar para análisis de datos.
+
+**Historias seleccionadas**: HU5, HU6, HU7, HU8.
+
+**Entregable**: v0.2 con pruebas, exportación y respuesta automática.
 
 ---
 
-#### **Herramientas de seguimiento**
+### **Herramientas de seguimiento**
 
 * **GitHub Projects**: Kanban (To do / In progress / Done).
 * **GitHub Issues**: Cada HU como issue, con etiquetas.
-* **GitHub Releases**: Publicar binarios de cada sprint.
+* **GitHub Releases**: Publicar configuraciones y binarios por sprint.
 
 ---
-
 
