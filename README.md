@@ -6,5 +6,5 @@ Documentación del Proyecto
 
 ## Desarrollo
 - [Design Thinking](./Documentacion-Desarrollo/DesignThinking.md)
-- [Lean Startup](./Documentacion-Desarrollo/LeanStartup.md)
-- [Scrum](./Documentacion-Desarrollo/Scrum.md)
+- [Lean Startup](./Documentacion-Desarrollo/LearnStartup.md)
+- [Scrum](./Documentacion-Desarrollo/Scrum.md
